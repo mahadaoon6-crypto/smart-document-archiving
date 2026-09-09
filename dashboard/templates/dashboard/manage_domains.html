@@ -1,0 +1,96 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">🗂 إدارة المشاريع</h2>
+
+<a href="{% url 'create_domain' %}" class="btn btn-success mb-4">
+    ➕ إنشاء مشروع جديد
+</a>
+
+<div class="row">
+
+    {% for item in domain_info %}
+    {% with domain=item.domain indexes=item.indexes doc_count=item.doc_count %}
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+
+
+            
+            <div class="card-header bg-primary text-white d-flex justify-content-between">
+                <strong>{{ domain.title }}</strong>
+                
+                {% if domain.is_active %}
+                    <a href="{% url 'manage_human_indexes' %}" class="btn btn-sm btn-light">
+                        🧠 إدارة الفهارس
+                    </a>
+                {% endif %}
+
+
+                
+
+            </div>
+
+            <div class="card-body">
+
+                <p class="text-muted">{{ domain.description }}</p>
+
+                <p><strong>📄 عدد الوثائق:</strong> {{ doc_count }}</p>
+
+                <p><strong>🧠 عدد الفهارس:</strong> {{ indexes.count }}</p>
+
+                <button class="btn btn-outline-primary btn-sm" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#domain{{ domain.id }}">
+                    عرض تفاصيل المشروع
+                </button>
+
+                <div class="collapse mt-3" id="domain{{ domain.id }}">
+                    <div class="card card-body">
+
+                        <h6>🧠 فهارس المشروع:</h6>
+                        <ul class="list-group mb-3">
+                            {% for idx in indexes %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>{{ idx.name }}</span>
+                                <span class="text-muted">{{ idx.description }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                        <p><strong>📅 تاريخ الإنشاء:</strong> {{ domain.created_at|date:"Y-m-d" }}</p>
+
+                        {% if domain.is_active %}
+                            <a href="{% url 'activate_domain' domain.id %}" 
+                                class="btn btn-warning btn-sm">
+                                ❌ إلغاء التفعيل
+                            </a>
+                        {% else %}
+                            <a href="{% url 'activate_domain' domain.id %}" 
+                                class="btn btn-success btn-sm">
+                                ✔ تفعيل المشروع
+                            </a>
+                        {% endif %}
+
+                        <a href="{% url 'delete_domain' domain.id %}" 
+                            class="btn btn-danger btn-sm mt-2"
+                            onclick="return confirm('هل أنت متأكد من حذف هذا المشروع؟ سيتم حذف جميع الوثائق والفهارس المرتبطة به.')">
+                            🗑 حذف المشروع
+                        </a>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    {% endwith %}
+    {% endfor %}
+
+</div>
+
+{% endblock %}
