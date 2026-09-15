@@ -1,0 +1,48 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">إنشاء مشروع أرشفة جديد</h2>
+
+<form method="POST" class="card p-4 shadow-sm">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label class="form-label">اسم المشروع:</label>
+        <input type="text" name="title" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">وصف المشروع (اختياري):</label>
+        <textarea name="description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">إنشاء المشروع</button>
+</form>
+
+<!-- ⭐ مربع التوضيح الجديد -->
+<div class="alert alert-info mt-4">
+    <h5 class="mb-2">📌 قبل البدء باستخدام المشروع</h5>
+
+    <p>
+        بعد إنشاء المشروع، يجب عليك إضافة <strong>فهرسين على الأقل</strong> داخل هذا المشروع 
+        (مثل: فهرس الوثائق الإدارية، فهرس الوثائق المالية…).
+    </p>
+
+    <p>
+        بعد ذلك، قم برفع <strong>عدد أدنى من الوثائق</strong> (نقترح 10 وثائق كبداية) ليتمكن النموذج من فهم بنية المشروع.
+    </p>
+
+    <p>
+        سيقوم النظام باستخدام هذه الوثائق لتدريب النموذج تلقائيًا، وبعدها سيبدأ النموذج بعملية 
+        <strong>التصنيف الذكي للوثائق الجديدة</strong> وفقًا للفهرس المناسب.
+    </p>
+
+    <p class="mt-3">
+        كما يمكنك إعادة تدريب النموذج في أي وقت إذا قمت بتعديل بنية الفهارس أو تغيّرت طبيعة الوثائق التي ترفعها،
+        وذلك ليتمكن النموذج من التكيّف مع الهيكل الجديد وتحسين دقته في التصنيف التلقائي.
+    </p>
+</div>
+
+
+{% endblock %}

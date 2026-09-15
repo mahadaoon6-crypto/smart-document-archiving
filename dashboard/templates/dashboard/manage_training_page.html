@@ -1,0 +1,215 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h2 class="mb-4">إدارة مجال التدريب والفهارس البشرية 🤖</h2>
+
+<!-- رسائل النظام -->
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+  {% endfor %}
+{% endif %}
+
+<!-- القسم 1: إدارة مجال التدريب (مفتوح دائماً) -->
+<div class="card mb-3">
+  <div class="card-header bg-primary text-white" data-bs-toggle="collapse" data-bs-target="#domainSection">
+    إدارة مجال التدريب (موضوع الفهرسة)
+  </div>
+
+  <!-- القسم الأول يبقى مفتوحاً دائماً -->
+  <div id="domainSection" class="collapse show">
+    <div class="card-body">
+
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="save_domain" value="1">
+
+        <div class="mb-3">
+          <label class="form-label">عنوان المجال (موضوع الفهرسة)</label>
+          <input type="text" name="title" class="form-control"
+                 value="{{ domain.title }}" placeholder="مثال: شؤون العاملين، العقود القانونية، المعاملات المالية">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">وصف المجال</label>
+          <textarea name="description" class="form-control" rows="3"
+                    placeholder="وصف مختصر لطبيعة الوثائق في هذا المجال">{{ domain.description }}</textarea>
+        </div>
+
+        <button class="btn btn-primary">
+          {% if domain %}تعديل مجال التدريب{% else %}إنشاء مجال تدريب جديد{% endif %}
+        </button>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- القسم 2: إدارة الفهارس البشرية -->
+<div class="card mb-3">
+  <div class="card-header bg-secondary text-white" data-bs-toggle="collapse" data-bs-target="#indexesSection">
+    إدارة الفهارس البشرية (تصنيفات الوثائق داخل المجال)
+  </div>
+
+  <!-- فتح القسم تلقائياً إذا كان المستخدم أضاف فهرساً -->
+  <div id="indexesSection" class="collapse {% if open_section == 'indexes' %}show{% endif %}">
+    <div class="card-body">
+
+      <!-- إضافة فهرس جديد -->
+      <form method="POST" class="mb-4">
+        {% csrf_token %}
+        <input type="hidden" name="add_index" value="1">
+
+        <div class="mb-3">
+          <label class="form-label">اسم الفهرس</label>
+          <input type="text" name="index_name" class="form-control"
+                 placeholder="مثال: عقد عمل، قرار تعيين">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">وصف الفهرس</label>
+          <textarea name="index_desc" class="form-control" rows="2"
+                    placeholder="وصف مختصر لطبيعة هذا الفهرس"></textarea>
+        </div>
+
+        <button class="btn btn-secondary">إضافة فهرس جديد</button>
+      </form>
+
+      <!-- عرض الفهارس الحالية -->
+      <h5 class="mb-3">الفهارس الحالية في هذا المجال</h5>
+
+      {% if indexes %}
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>اسم الفهرس</th>
+              <th>الوصف</th>
+              <th>تاريخ الإنشاء</th>
+              <th>خيارات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for idx in indexes %}
+              <tr>
+                <td>{{ idx.name }}</td>
+                <td>{{ idx.description }}</td>
+                <td>{{ idx.created_at }}</td>
+                <td>
+                  <a href="{% url 'edit_index' idx.id %}" class="btn btn-warning btn-sm">تعديل</a>
+                  <a href="{% url 'delete_index' idx.id %}" class="btn btn-danger btn-sm">حذف</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>لا توجد فهارس بعد لهذا المجال.</p>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+<!-- القسم 3: رفع وثائق التدريب -->
+<div class="card mb-3">
+  <div class="card-header bg-info text-white" data-bs-toggle="collapse" data-bs-target="#docsSection">
+    رفع وثائق التدريب وتصنيفها بالفهرس المناسب
+  </div>
+
+  <!-- فتح القسم تلقائياً إذا رفع المستخدم وثيقة -->
+  <div id="docsSection" class="collapse {% if open_section == 'docs' %}show{% endif %}">
+    <div class="card-body">
+
+      <!-- رفع وثيقة تدريب جديدة -->
+      <form method="POST" enctype="multipart/form-data" class="mb-4">
+        {% csrf_token %}
+        <input type="hidden" name="upload_doc" value="1">
+
+        <div class="mb-3">
+          <label class="form-label">اختيار الفهرس</label>
+          <select name="doc_index" class="form-select">
+            <option value="">اختر الفهرس المناسب لهذه الوثيقة</option>
+            {% for idx in indexes %}
+              <option value="{{ idx.id }}">{{ idx.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">ملف الوثيقة (PDF أو صورة)</label>
+          <input type="file" name="doc_file" class="form-control">
+        </div>
+
+        <button class="btn btn-info">رفع وثيقة تدريب جديدة</button>
+      </form>
+
+      <!-- عرض وثائق التدريب الحالية -->
+      <h5 class="mb-3">وثائق التدريب الحالية في هذا المجال</h5>
+
+      {% if docs %}
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>اسم الملف</th>
+              <th>الفهرس</th>
+              <th>تاريخ الإضافة</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in docs %}
+              <tr>
+                <td>{{ d.file_name }}</td>
+                <td>{{ d.index.name }}</td>
+                <td>{{ d.created_at }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>لا توجد وثائق تدريب بعد لهذا المجال.</p>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+<!-- القسم 4: جاهزية التدريب -->
+<div class="card mb-3">
+  <div class="card-header bg-warning text-dark" data-bs-toggle="collapse" data-bs-target="#readinessSection">
+    جاهزية التدريب على هذا المجال
+  </div>
+
+  <div id="readinessSection" class="collapse {% if open_section == 'readiness' %}show{% endif %}">
+    <div class="card-body">
+
+      <h5 class="mb-3">ملخص البيانات الحالية</h5>
+
+      <ul>
+        <li>عدد الفهارس في هذا المجال: {{ indexes|length }}</li>
+        <li>عدد وثائق التدريب في هذا المجال: {{ docs|length }}</li>
+      </ul>
+
+      <p>
+        يفضّل أن يكون لكل فهرس عدد كافٍ من الوثائق قبل البدء في التدريب لضمان جودة النموذج.
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<!-- القسم 5: سجل التدريب -->
+<div class="card mb-3">
+  <div class="card-header bg-dark text-white" data-bs-toggle="collapse" data-bs-target="#historySection">
+    سجل التدريب لهذا المجال
+  </div>
+
+  <div id="historySection" class="collapse {% if open_section == 'history' %}show{% endif %}">
+    <div class="card-body">
+      <p>سيتم ربط هذا القسم لاحقاً بسجل التدريب.</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container" dir="rtl" style="text-align: right;">
+
+    <h3 class="mb-4">تفاصيل الوثيقة رقم {{ document.id }}</h3>
+
+    <!-- معاينة الوثيقة -->
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            معاينة الوثيقة
+        </div>
+        <div class="card-body">
+            <p><strong>رقم السجل:</strong> {{ document.record_number }}</p>
+            <p><strong>نوع الوثيقة:</strong> {{ document.doc_type }}</p>
+            <p><strong>تاريخ الرفع:</strong> {{ document.uploaded_at }}</p>
+        </div>
+    </div>
+
+    <!-- نص OCR -->
+    <div class="card mb-3">
+        <div class="card-header bg-secondary text-white">
+            نص الوثيقة (OCR)
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" rows="8" readonly>{{ ocr_text|default:"لا يوجد نص مستخرج" }}</textarea>
+        </div>
+    </div>
+
+    <!-- الفهرس الحالي + الأزرار -->
+    <div class="card mb-3">
+        <div class="card-header bg-info text-white">
+            الفهرس الحالي
+        </div>
+        <div class="card-body">
+            <p><strong>{{ document.classification_result|default:"غير مصنف" }}</strong></p>
+            <a href="{% url 'correct_classification' document.id %}" class="btn btn-warning">✏️ تعديل التصنيف</a>
+            <a href="{% url 'accept_classification' document.id %}" class="btn btn-success">✔ قبول التصنيف</a>
+            <a href="{% url 'rerun_ocr' document.id %}" class="btn btn-primary">🔄 إعادة تشغيل OCR</a>
+        </div>
+    </div>
+
+    <!-- سجل التصحيحات البشرية -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-white">
+            سجل التصحيحات البشرية
+        </div>
+        <div class="card-body">
+            {% if document.manualindex_set.all %}
+                <ul class="list-group">
+                    {% for correction in document.manualindex_set.all %}
+                        <li class="list-group-item">
+                            <strong>التصحيح الجديد:</strong> {{ correction.corrected_label }}<br>
+                            <small>بواسطة: {{ correction.indexed_by }} — {{ correction.timestamp }}</small><br>
+                            <em>ملاحظات: {{ correction.notes }}</em>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">لا توجد تصحيحات بشرية لهذه الوثيقة.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

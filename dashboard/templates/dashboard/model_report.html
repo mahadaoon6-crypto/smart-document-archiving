@@ -1,0 +1,69 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+
+<h2 class="mt-4 mb-4">📊 تقرير النموذج</h2>
+
+{% if error %}
+    <div class="alert alert-warning">{{ error }}</div>
+{% else %}
+
+<!-- دقة النموذج -->
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>دقة النموذج</strong>
+    </div>
+    <div class="card-body">
+        <h4>{{ accuracy|floatformat:4 }}</h4>
+    </div>
+</div>
+
+<!-- مصفوفة الالتباس -->
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>مصفوفة الالتباس</strong>
+    </div>
+    <div class="card-body">
+
+        <table class="table table-bordered text-center">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>est</th>
+                    <th>ins</th>
+                    <th>lic</th>
+                    <th>sup</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in confusion_matrix %}
+                <tr>
+                    <th>{{ forloop.counter }}</th>
+                    {% for cell in row %}
+                        <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<!-- تقرير التصنيف الكامل -->
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>تقرير التصنيف (Classification Report)</strong>
+    </div>
+    <div class="card-body">
+        <pre class="p-3 bg-light border" style="white-space: pre-wrap;">
+{{ report }}
+        </pre>
+    </div>
+</div>
+
+{% endif %}
+
+<a href="{% url 'dashboard' %}" class="btn btn-secondary">عودة للوحة التحكم</a>
+
+{% endblock %}
