@@ -1,0 +1,107 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4" dir="rtl" style="text-align: right;">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="alert {% if is_trained %}alert-primary{% else %}alert-warning{% endif %}">
+        {% if is_trained %}
+            🤖 المشروع مدرّب — سيتم اقتراح الفهرس تلقائيًا عند رفع الوثيقة.
+        {% else %}
+            ⚠️ المشروع غير مدرّب — يجب اختيار الفهرس يدويًا.
+        {% endif %}
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            📤 رفع وثيقة جديدة — المشروع: {{ active_domain.title }}
+        </div>
+
+        <div class="card-body">
+
+            <!-- النموذج الصحيح -->
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label">رقم السجل</label>
+                    <input type="text" name="record_number" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">نوع الوثيقة</label>
+                    <input type="text" name="doc_type" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">اختر الوثيقة</label>
+                    <input type="file" name="file" class="form-control" required>
+                </div>
+
+                {% if not is_trained %}
+                <div class="mb-3">
+                    <label class="form-label">الفهرس</label>
+                    <select name="index" class="form-select" required>
+                        <option value="">اختر الفهرس</option>
+                        {% for idx in indexes %}
+                            <option value="{{ idx.id }}">{{ idx.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                {% if is_trained and suggested_index %}
+                <div class="alert alert-info">
+                    🔍 الفهرس المقترح تلقائيًا:
+                    <strong>{{ suggested_index.name }}</strong>
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-success px-4">
+                    ✔️ رفع الوثيقة
+                </button>
+            </form>
+            <!-- نهاية النموذج الصحيح -->
+
+        </div>
+    </div>
+
+    {% if not is_trained %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            📊 حالة الفهارس المطلوبة للتدريب
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for item in index_stats %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ item.name }}</span>
+                        <span>
+                            {{ item.count }} / {{ item.min_required }}
+                            {% if item.ready %}
+                                ✔ جاهز
+                            {% else %}
+                                ⏳ غير مكتمل
+                            {% endif %}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% if show_training_ready_message %}
+            <div class="alert alert-success mt-3">
+                🎉 جميع الفهارس جاهزة — يمكنك بدء تدريب النموذج الآن!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

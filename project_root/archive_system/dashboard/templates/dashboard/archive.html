@@ -1,0 +1,31 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<h2>📁 الأرشيف العام — مشروع: {{ active_domain.title }}</h2>
+
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>رقم الإضبارة</th>
+            <th>عدد الوثائق</th>
+            <th>عرض الوثائق</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for d in dossiers %}
+        <tr>
+            <td>{{ d.record_number }}</td>
+            <td>{{ d.count }}</td>
+            <td>
+                <a href="{% url 'dossier_detail_view' d.record_number %}" class="btn btn-primary btn-sm">
+                    عرض
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{
+  "domain_id": 6,
+  "domain_title": "الديوان",
+  "classes": [
+    "input_doc",
+    "output_doc"
+  ],
+  "n_features": 896,
+  "training_records": 36,
+  "training_accuracy": 1.0,
+  "ignored_rows": 0,
+  "trained_at": "2026-09-15T12:07:14.550221+00:00"
+}

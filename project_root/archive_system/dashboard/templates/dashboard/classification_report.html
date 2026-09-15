@@ -1,0 +1,112 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-3">📄 تقرير تصنيف الوثيقة</h2>
+
+    <!-- معلومات الوثيقة -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">معلومات الوثيقة</h5>
+            <p><strong>رقم السجل:</strong> {{ document.record_number }}</p>
+            <p><strong>نوع الوثيقة:</strong> {{ document.doc_type }}</p>
+            <p><strong>الفهرس الحالي:</strong>
+                {% if document.index %}
+                    <span class="badge bg-primary">{{ document.index.name }}</span>
+                {% else %}
+                    <span class="badge bg-secondary">غير مصنّفة</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- نتيجة التصنيف -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">نتيجة التصنيف</h5>
+
+            <h4>
+                <span class="badge bg-success">{{ result }}</span>
+            </h4>
+
+            {% if confidence %}
+                <p><strong>الثقة:</strong> {{ confidence|floatformat:2 }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- نص OCR -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">نص OCR المستخرج</h5>
+            <textarea class="form-control" rows="8" readonly>{{ text }}</textarea>
+        </div>
+    </div>
+
+    <!-- التمثيلات العددية -->
+    <div class="accordion mb-4" id="embeddingsAccordion">
+
+        <!-- CAMeLBERT Embedding -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingEmb">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseEmb">
+                    التمثيل الأصلي (CAMeLBERT – 768)
+                </button>
+            </h2>
+            <div id="collapseEmb" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <pre>{{ emb }}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projection Head -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingZ">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseZ">
+                    التمثيل الذاتي (Projection Head – 128)
+                </button>
+            </h2>
+            <div id="collapseZ" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <pre>{{ z }}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combined Vector -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingCombined">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseCombined">
+                    التمثيل المدمج (896)
+                </button>
+            </h2>
+            <div id="collapseCombined" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <pre>{{ combined }}</pre>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- أزرار -->
+    <div class="mt-4">
+        <a href="{% url 'rerun_classification' document.id %}" class="btn btn-warning">
+            🔄 إعادة التصنيف
+        </a>
+
+        <a href="{% url 'document_detail' document.id %}" class="btn btn-secondary">
+            ⬅ العودة إلى الوثيقة
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

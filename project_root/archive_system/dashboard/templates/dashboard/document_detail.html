@@ -1,0 +1,63 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<h2>📄 تفاصيل الوثيقة — مشروع: {{ active_domain.title }}</h2>
+
+<div class="card">
+    <div class="card-body">
+
+        <p><strong>اسم الملف:</strong> {{ document.file_name }}</p>
+
+        <p><strong>رقم الإضبارة:</strong> {{ document.record_number }}</p>
+
+        <p><strong>نوع الوثيقة:</strong> {{ document.doc_type }}</p>
+
+        <p><strong>تاريخ الرفع:</strong> {{ document.created_at }}</p>
+
+
+        <p><strong>نتيجة التصنيف:</strong> {{ document.classification_result }}</p>
+    
+
+        <hr>
+
+        <p><strong>نص الوثيقة (OCR):</strong></p>
+        <div style="
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 200px;
+            overflow-y: scroll;
+            background: #f9f9f9;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+        ">
+            {{ document.ocr_text }}
+        </div>
+
+        <hr>
+    
+
+        <h4>📌 الفهارس البشرية الخاصة بالمشروع</h4>
+        <ul>
+            {% for idx in indexes %}
+                <li>{{ idx.name }} — {{ idx.description }}</li>
+            {% endfor %}
+        </ul>
+          <hr>
+         
+             
+        <a href="{% url 'document_file' document.id %}" target="_blank" class="btn btn-info mt-3">
+            فتح الوثيقة
+        </a>
+
+
+        <a href="{% url 'classification_report' document.id %}" class="btn btn-info mt-3">
+            📊 عرض تقرير التصنيف
+        </a>
+
+
+
+    </div>
+</div>
+
+{% endblock %}

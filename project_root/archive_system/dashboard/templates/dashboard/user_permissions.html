@@ -1,0 +1,43 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2 class="mb-4">🔐 صلاحياتي داخل النظام</h2>
+
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <strong>المستخدم الحالي</strong>
+        </div>
+        <div class="card-body">
+            <p><strong>اسم المستخدم:</strong> {{ user.username }}</p>
+            <p><strong>البريد الإلكتروني:</strong> {{ user.email }}</p>
+            <p><strong>المجموعات:</strong>
+                {% for g in groups %}
+                    {{ g.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    لا ينتمي لأي مجموعة
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <strong>الصلاحيات</strong>
+        </div>
+        <div class="card-body">
+            <ul>
+                {% for perm in permissions %}
+                    <li>{{ perm }}</li>
+                {% empty %}
+                    <li>لا توجد صلاحيات</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

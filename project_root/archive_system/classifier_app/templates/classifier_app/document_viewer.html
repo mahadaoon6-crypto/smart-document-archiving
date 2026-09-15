@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        {{ document.file_name }}
+    </title>
+
+    <style>
+
+        body {
+            margin: 0;
+            background: #f3f4f6;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 25px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .viewer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 25px;
+        }
+
+        .document-image {
+            max-width: 95%;
+            max-height: 85vh;
+            object-fit: contain;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+
+    <strong>
+        {{ document.file_name }}
+    </strong>
+
+    {% if document.record_number %}
+
+        |
+        رقم السجل:
+        {{ document.record_number }}
+
+    {% endif %}
+
+    {% if document.index %}
+
+        |
+        الفهرس:
+        {{ document.index.name }}
+
+    {% endif %}
+
+</div>
+
+<div class="viewer">
+    <img
+        src="{% url 'document_file' document.id %}"
+        class="document-image"
+        alt="{{ document.file_name }}"
+    >
+</div>
+
+</body>
+
+</html>

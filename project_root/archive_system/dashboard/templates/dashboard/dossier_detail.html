@@ -1,0 +1,55 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<h2>📄 الوثائق داخل الإضبارة: {{ record_number }} — مشروع: {{ active_domain.title }}</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>اسم الملف</th>
+            <th>رقم السجل</th>
+            <th>نوع الوثيقة</th>
+            <th>فهرس التصنيف</th>
+            <th>فتح الوثيقة</th>
+            <th>تفاصيل الوثيقة</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for document in documents %}
+        <tr>
+            <td>{{ document.file_name }}</td>
+            <td>{{ document.record_number }}</td>
+            <td>{{ document.doc_type }}</td>
+            <td>{{ document.classification_result }}</td>
+
+            <!-- فتح الوثيقة الأصلية -->
+            <td>
+                {% if document.invalid %}
+                    <span class="text-danger">وثيقة غير صالحة</span>
+                {% else %}
+                    <a href="{% url 'document_file' document.id %}" target="_blank"
+                       class="btn btn-success btn-sm">
+                        فتح
+                    </a>
+                {% endif %}
+            </td>
+
+            <!-- تفاصيل الوثيقة -->
+            <td>
+                {% if document.invalid %}
+                    <span class="text-danger">وثيقة غير صالحة</span>
+                {% else %}
+                    <a href="{% url 'document_detail_view' document.id %}" 
+                       class="btn btn-primary btn-sm" target="_blank">
+                        تفاصيل الوثيقة
+                    </a>
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
